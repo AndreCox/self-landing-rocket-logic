@@ -12,3 +12,4 @@ void bluetoothLog();
 void errorCode(int error);
 void logSetup();
 void logToSerial();
+void log();

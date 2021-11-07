@@ -38,7 +38,7 @@ void sdSetup();
 void bluetoothSetup();
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   logger.add(Serial, LOG_LEVEL_VERBOSE);  // This will log everything on Serial
   inf << np << endl;  // Displays an end of line without the prefix (Because of "np")
   verb << "Begin Setup...\n";
