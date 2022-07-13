@@ -1,0 +1,1 @@
+SoftwareSerial bluetoothSetup(int ledPin, int output);

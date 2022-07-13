@@ -1,26 +1,31 @@
 #include "control.h"
 
-bool preLaunch() {
-  bool complete = false;
-  return complete;
+#include <ArduinoLogger.h>
+
+void preLaunch() {
+  verb << "Pre-Launch\n";
+}
+void launch() {
+  verb << "Launch\n";
+}
+void postLaunch() {
+  verb << "Post-Launch\n";
+}
+void decent() {
+  verb << "Decent\n";
 }
 
-bool launch() {
-  bool complete = false;
+// pointers to functions in array
+void (*states[4])() = {preLaunch, launch, postLaunch, decent};
 
-  return complete;
+void StateMachine::progress() {
+  StateMachine::currentState++;
 }
 
-bool flight() {
-  bool complete = false;
-
-  return complete;
+void StateMachine::update() {
+  states[StateMachine::currentState]();
 }
 
-bool descent() {
-  bool complete = false;
-
-  return complete;
+void StateMachine::reset() {
+  StateMachine::currentState = 0;
 }
-
-void stateMachine() {}

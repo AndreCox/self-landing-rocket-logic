@@ -13,6 +13,8 @@
 #include <SoftwareSerial.h>
 
 #include "../configuration.h"
+#include "bluetooth.h"
+#include "control.h"
 #include "globals.h"
 #include "logging.h"
 #include "sensors.h"
@@ -28,14 +30,15 @@ unsigned short chipSelect = ChipSelect;
 unsigned short ledPin = LEDPin;
 unsigned short state = 0;
 unsigned short flag = 0;
+SoftwareSerial bluetooth = bluetoothSetup(ledPin, HIGH);
 float data[7][3] = {0};
+StateMachine stateMachine = StateMachine();
 
 /////////////////////////////////////////////////////
 
 // setup
 void imuSetup();
 void sdSetup();
-void bluetoothSetup();
 
 void setup() {
   Serial.begin(115200);
@@ -47,13 +50,16 @@ void setup() {
   sensorsSetup();
   imuSetup();
   sdSetup();
-  // bluetoothSetup();
   delay(100);
 }
 
 void loop() {
   /* Get new sensor events with the readings */
   pollSensors();
+  /* Update the state machine */
+  stateMachine.update();
+  verb << bluetooth.read();
+
 #ifdef log
   sdLog(data);
 // bluetoothLog();
@@ -87,10 +93,4 @@ void sdSetup() {
     }
   }
 #endif
-}
-
-void bluetoothSetup() {
-  pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, LOW);
-  SoftwareSerial Bluetooth(0, 1);  // RX, TX
 }
