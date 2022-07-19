@@ -6,10 +6,10 @@
 //#include "SdFat.h"
 //#include "sdios.h"
 
+void sdSetup();
 void dataWriteToFile(float[7][3], File dataFile);
 void sdLog(float (&data)[7][3]);
 void bluetoothLog();
 void errorCode(int error);
-void logSetup();
 void logToSerial();
 void log();

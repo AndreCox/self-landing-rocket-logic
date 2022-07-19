@@ -36,21 +36,16 @@ StateMachine stateMachine = StateMachine();
 
 /////////////////////////////////////////////////////
 
-// setup
-void imuSetup();
-void sdSetup();
-
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   logger.add(Serial, LOG_LEVEL_VERBOSE);  // This will log everything on Serial
   inf << np << endl;  // Displays an end of line without the prefix (Because of "np")
-  verb << "Begin Setup...\n";
-
-  logSetup();
-  sensorsSetup();
+  verb << "Beginning Setup" << endl;
   imuSetup();
   sdSetup();
   delay(100);
+  verb << "Setup Complete" << endl;
+  verb << "Beginning Main Loop" << endl;
 }
 
 void loop() {
@@ -58,39 +53,5 @@ void loop() {
   pollSensors();
   /* Update the state machine */
   stateMachine.update();
-  verb << bluetooth.read();
-
-#ifdef log
-  sdLog(data);
-// bluetoothLog();
-#endif
-}
-
-///////////////////////////////// Setup Funcitons ///////////////////////////////////////
-
-void imuSetup() {
-  if (!bno.begin()) {
-    /* There was a problem detecting the BNO055 ... check your connections */
-
-    err << "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!\n";
-
-    while (1) {
-      errorCode(0);
-    }
-  }
-
-  delay(1000);
-}
-
-void sdSetup() {
-#ifdef LOGSD
-  // see if the card is present and can be initialized:
-  if (!SD.begin(chipSelect)) {
-    err << "Card failed, or not present\n";
-
-    while (1) {
-      errorCode(1);
-    }
-  }
-#endif
+  // verb << bluetooth.read();
 }

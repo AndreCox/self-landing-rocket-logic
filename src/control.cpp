@@ -2,30 +2,60 @@
 
 #include <ArduinoLogger.h>
 
-void preLaunch() {
-  verb << "Pre-Launch\n";
+String charBuffer = "";
+
+bool preLaunch() {
+  // decode serial until we get a valid command
+  while (Serial.available() > 0) {
+    char c = Serial.read();
+    charBuffer += c;
+  }
+  if (charBuffer.length() > 0) {
+    if (charBuffer.equals("launch")) {
+      inf << "Launch Command Received!" << endl;
+      charBuffer = "";
+      return true;
+    }
+    inf << "Serial: " << charBuffer << endl;
+    charBuffer = "";
+  }
+  return false;
 }
-void launch() {
-  verb << "Launch\n";
+bool launch() {
+  inf << "Starting Takeoff!" << endl;
+  return true;
+  return false;
 }
-void postLaunch() {
-  verb << "Post-Launch\n";
+bool postLaunch() {
+  inf << "Finished Takeoff!" << endl;
+  return true;
+  return false;
 }
-void decent() {
-  verb << "Decent\n";
+bool decent() {
+  inf << "Starting Descent!" << endl;
+  while (true) {
+    int i = 0;
+  }
+
+  return false;
 }
 
 // pointers to functions in array
-void (*states[4])() = {preLaunch, launch, postLaunch, decent};
+bool (*states[4])() = {preLaunch, launch, postLaunch, decent};
 
 void StateMachine::progress() {
   StateMachine::currentState++;
 }
 
 void StateMachine::update() {
-  states[StateMachine::currentState]();
+  if (states[StateMachine::currentState]()) {
+    verb << "State finished transitioning to next state" << endl;
+    StateMachine::progress();
+    verb << "State: " << StateMachine::currentState << endl;
+  };
 }
 
 void StateMachine::reset() {
+  verb << "Reseting State" << endl;
   StateMachine::currentState = 0;
 }

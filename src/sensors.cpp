@@ -2,12 +2,25 @@
 //#define TINY_BME280_SPI
 //#include <TinyBME280.h>
 
+#include "ArduinoLogger.h"
 #include "globals.h"
 #include "logging.h"
 // tiny::BME280 barometer;
 
-void sensorsSetup() {
-  //  barometer.begin();
+void imuSetup() {
+  verb << "Initializing IMU" << endl;
+  if (!bno.begin()) {
+    /* There was a problem detecting the BNO055 ... check your connections */
+    err << "Ooops, no BNO055 detected, Check your wiring or I2C ADDR!" << endl;
+
+    while (1) {
+      errorCode(0);
+    }
+  }
+
+  delay(1000);
+  verb << "IMU Initialization Complete" << endl;
+  return;
 }
 
 void pollSensors() {
@@ -35,12 +48,10 @@ void pollSensors() {
   updateValues(&magnetometerData, data[3]);
   updateValues(&accelerometerData, data[4]);
   updateValues(&gravityData, data[5]);
-  data[6][0] = millis();
 }
 
 // Take data row and append values based on which event type it is
 void updateValues(sensors_event_t* event, float (&data)[3]) {
-  logToSerial();
   switch (event->type) {
     case SENSOR_TYPE_ACCELEROMETER:
       // Serial.print("Accl:");

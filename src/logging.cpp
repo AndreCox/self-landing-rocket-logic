@@ -9,61 +9,40 @@
 #include "globals.h"
 //#include "sdios.h"
 
-#ifdef LOGSD
-// SdFat sd;
-// SdFile file;
-#endif
-
-void logSetup() {}
-
-// this code is horrific but we can fix it later
 void logToSerial() {
+// [1] orientation
+// [2] angular velocity
+// [3] linear acceleration
+// [4] magnitometer
+// [5] accelerometer
+// [6] gravity
+// [7] time
 #ifdef LogSensorSerial
-  Serial.print("/*");  // orentation
-  Serial.print(data[0][0]);
-  Serial.print(",");
-  Serial.print(data[0][1]);
-  Serial.print(",");
-  Serial.print(data[0][2]);
-  //////////////////////
-  Serial.print(",");  // ang Velocity
-  Serial.print(data[1][0]);
-  Serial.print(",");
-  Serial.print(data[1][1]);
-  Serial.print(",");
-  Serial.print(data[1][2]);
-  //////////////////////
-  Serial.print(",");  // Linear acceleration
-  Serial.print(data[2][0]);
-  Serial.print(",");
-  Serial.print(data[2][1]);
-  Serial.print(",");
-  Serial.print(data[2][2]);
-  //////////////////////
-  Serial.print(",");  // magnetometer
-  Serial.print(data[3][0]);
-  Serial.print(",");
-  Serial.print(data[3][1]);
-  Serial.print(",");
-  Serial.print(data[3][2]);
-  //////////////////////
-  Serial.print(",");  // accelerometer
-  Serial.print(data[4][0]);
-  Serial.print(",");
-  Serial.print(data[4][1]);
-  Serial.print(",");
-  Serial.print(data[4][2]);
-  //////////////////////
-  Serial.print(",");  // gravity
-  Serial.print(data[5][0]);
-  Serial.print(",");
-  Serial.print(data[5][1]);
-  Serial.print(",");
-  Serial.print(data[5][2]);
-  //////////////////////
-  Serial.print(",");  // time
-  Serial.print(data[6][0]);
-  Serial.print("*/\n");
+  for (int i = 0; i < 6; i++) {
+    for (int j = 0; j < 3; j++) {
+      Serial.print(data[i][j]);
+      Serial.print(",");
+    }
+    Serial.println();
+  }
+#endif
+}
+
+void sdSetup() {
+#ifdef LOGSD
+  verb << "Initializing SD" << endl;
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    err << "Card failed, or not present\n";
+
+    while (1) {
+      errorCode(1);
+    }
+  }
+  verb << "SD Initialization Complete" << endl;
+#endif
+#ifndef LOGSD
+  warn << "SD Logging Disabled" << endl;
 #endif
 }
 
@@ -95,28 +74,6 @@ void dataWriteToFile(float data[7][3], File dataFile) {
     }
   }
   dataFile.print("\n");
-#endif
-}
-
-void bluetoothLog() {
-#ifdef LOGBT
-  if (Serial.available() > 0) {
-    state = Serial.read();
-    flag = 0;
-  }
-  if (state == '0') {
-    digitalWrite(ledPin, LOW);
-  }
-  if (flag == 0) {
-    inf << "LED: off";
-    flag = 1;
-  } else if (state == '1') {
-    digitalWrite(ledPin, HIGH);
-    if (flag == 0) {
-      inf << "LED: on";
-      flag = 1;
-    }
-  }
 #endif
 }
 
